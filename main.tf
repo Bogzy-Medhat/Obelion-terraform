@@ -65,8 +65,8 @@ module "rds_sg" {
 
 module "backend" {
   source            = "./modules/backend"
-  ami_id            = "ami-0dba2cb6798deb6d8"
-  key_name          = "your-key-pair"
+  ami_id            = "ami-005fc0f236362e99f"
+  key_name          = "Obelion_task"
   instance_type     = "t2.micro"
   security_group_id = module.backend_sg.id
   subnet_id         = element(module.vpc.public_subnet_ids, 0)
@@ -74,8 +74,8 @@ module "backend" {
 
 module "frontend" {
   source            = "./modules/frontend"
-  ami_id            = "ami-0dba2cb6798deb6d8"
-  key_name          = "your-key-pair"
+  ami_id            = "ami-005fc0f236362e99f"
+  key_name          = "Obelion_task"
   instance_type     = "t2.micro"
   security_group_id = module.frontend_sg.id
   subnet_id         = element(module.vpc.public_subnet_ids, 1)
