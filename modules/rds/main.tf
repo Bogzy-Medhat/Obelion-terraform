@@ -3,9 +3,9 @@ resource "aws_db_instance" "mysql" {
   instance_class       = "db.t3.micro"
   engine               = "mysql"
   engine_version       = "8.0"
-  name                 = var.db_name
-  username             = var.db_username
-  password             = var.db_password
+  db_name              = "mydb"
+  username             = "admin"
+  password             = "password123"
   publicly_accessible  = false
   skip_final_snapshot  = true
   vpc_security_group_ids = [var.security_group_id]
@@ -17,11 +17,19 @@ resource "aws_db_instance" "mysql" {
 }
 
 resource "aws_db_subnet_group" "this" {
-  name       = "${var.db_name}-subnet-group"
-  subnet_ids = var.subnet_ids
+  name       = "mydb-subnet-group"
+  description = "Managed by Terraform"
+  
+  // Update this section to include subnets from at least two different AZs
+  subnet_ids = [
+      "subnet-0aa45b5e06618eb39", // Existing subnet
+      "subnet-0cb1142b009c0b93d", // Existing subnet
+      "subnet-02f5b39ff32abacee", // Add another subnet from a different AZ
+      "subnet-086208d0f78f43ec1"  // Add another subnet from a different AZ
+  ]
 
   tags = {
-    Name = "${var.db_name}-subnet-group"
+    Name = "mydb-subnet-group"
   }
 }
 
