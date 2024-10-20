@@ -18,3 +18,7 @@ variable "security_group_id" {
 variable "subnet_id" {
   description = "The subnet ID for the frontend instance"
 }
+variable "username" {
+  description = "The username to be added to the Docker group"
+  type        = string
+}
