@@ -20,19 +20,37 @@ resource "aws_db_subnet_group" "this" {
   name       = "mydb-subnet-group"
   description = "Managed by Terraform"
   
-  // Update this section to include subnets from at least two different AZs
-  subnet_ids = [
-      "subnet-0aa45b5e06618eb39", // Existing subnet
-      "subnet-0cb1142b009c0b93d", // Existing subnet
-      "subnet-02f5b39ff32abacee", // Add another subnet from a different AZ
-      "subnet-086208d0f78f43ec1"  // Add another subnet from a different AZ
-  ]
+  subnet_ids = aws_subnet.my_subnet[*].id // Reference the created subnets
 
   tags = {
     Name = "mydb-subnet-group"
   }
 }
 
+resource "aws_subnet" "my_subnet" {
+  count = 4 // Create 4 subnets
+  vpc_id = var.vpc_id // Ensure you have a variable for your VPC ID
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index) // Adjust CIDR as needed
+  availability_zone = element(data.aws_availability_zones.available.names, count.index) // Use different AZs
+
+  tags = {
+    Name = "mydb-subnet-${count.index}"
+  }
+}
+
 output "endpoint" {
   value = aws_db_instance.mysql.endpoint
+}
+
+// Add this data resource declaration
+data "aws_availability_zones" "available" {}
+
+variable "vpc_id" {
+  description = "The ID of the VPC where the subnets will be created."
+  type        = string
+}
+
+variable "vpc_cidr" {
+  description = "The CIDR block for the VPC."
+  type        = string
 }
