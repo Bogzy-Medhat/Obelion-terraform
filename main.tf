@@ -9,6 +9,10 @@ module "vpc" {
   public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
+output "vpc_cidr_block" {
+  value = module.vpc.vpc_cidr_block // Ensure this line correctly references the output
+}
+
 module "backend_sg" {
   source = "./modules/security_group"
   name   = "backend-sg"
@@ -70,6 +74,7 @@ module "backend" {
   instance_type     = "t2.micro"
   security_group_id = module.backend_sg.id
   subnet_id         = element(module.vpc.public_subnet_ids, 0)
+  username          = "ubuntu"
 }
 
 module "frontend" {
@@ -79,15 +84,18 @@ module "frontend" {
   instance_type     = "t2.micro"
   security_group_id = module.frontend_sg.id
   subnet_id         = element(module.vpc.public_subnet_ids, 1)
+  username          = "ubuntu"
 }
 
 module "rds" {
   source            = "./modules/rds"
+  vpc_id            = module.vpc.vpc_id
   db_name           = "mydb"
   db_username       = "admin"
   db_password       = "password123"
   security_group_id = module.rds_sg.id
   subnet_ids        = module.vpc.public_subnet_ids
+  vpc_cidr          = module.vpc.vpc_cidr_block // Uncommented this line to provide the required argument
 }
 
 module "cloudwatch_backend" {
