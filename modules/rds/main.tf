@@ -18,25 +18,29 @@ resource "aws_db_instance" "mysql" {
 
 resource "aws_db_subnet_group" "this" {
   name       = "mydb-subnet-group"
+  subnet_ids = [
+    "subnet-089575b2352e5438a",
+    "subnet-0b0f7c4737a2e2ddf",
+    "subnet-0af8e27f50c2ab2da",
+    "subnet-09067cf25afbed04b"
+  ]
   description = "Managed by Terraform"
-  
-  subnet_ids = aws_subnet.my_subnet[*].id // Reference the created subnets
-
   tags = {
     Name = "mydb-subnet-group"
   }
 }
 
 resource "aws_subnet" "my_subnet" {
-  count = 4 // Create 4 subnets
-  vpc_id = var.vpc_id // Ensure you have a variable for your VPC ID
-  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index) // Adjust CIDR as needed
-  availability_zone = element(data.aws_availability_zones.available.names, count.index) // Use different AZs
+  count = 2 # Use the actual subnet count if only two public subnets are used
+  vpc_id = var.vpc_id
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index)
+  availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
     Name = "mydb-subnet-${count.index}"
   }
 }
+
 
 output "endpoint" {
   value = aws_db_instance.mysql.endpoint
@@ -53,4 +57,14 @@ variable "vpc_id" {
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC."
   type        = string
+}
+
+variable "vpc_cidr_block" {
+  description = "The CIDR block for the VPC."
+  type        = string
+}
+
+variable "public_subnet_cidrs" {
+  description = "The CIDR blocks for the public subnets."
+  type        = list(string)
 }
