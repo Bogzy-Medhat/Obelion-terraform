@@ -21,5 +21,5 @@ variable "security_group_id" {
 variable "subnet_ids" {
   description = "List of subnet IDs for the RDS DB subnet group"
   type        = list(string)
-  default     = ["subnet-07c981f34209f3527", "subnet-039b8005827ad4dea"] # Replace with actual subnet IDs from different AZs
+  default     = [] // Leave this empty for now; it will be populated dynamically
 }
